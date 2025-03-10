@@ -1,0 +1,29 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# Virtual environment directories
+.env/
+.venv/
+venv/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+
+# pytest cache
+.cache/
+
+# Python-specific
+*.log
+*.pot
+*.pyc
+
+# Environment variables file
+.env
