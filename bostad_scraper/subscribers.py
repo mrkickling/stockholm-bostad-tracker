@@ -20,12 +20,12 @@ class Subscriber:
         email: str,
         frequency: NotificationFrequency,
         search_filter: SearchFilter,
-        subscriber_url = None
+        url = None
     ):
         self.email = email
         self.frequency = frequency
         self.filter = search_filter
-        self.subscriber_url = subscriber_url
+        self.url = url
 
     def __hash__(self):
         return hash(self.email)

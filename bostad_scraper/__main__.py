@@ -47,7 +47,7 @@ def send_emails_to_subscribers(
 
 
 def get_subscriber_apartments(
-        subscribers
+        subscribers: list[Subscriber]
     ) -> dict[Subscriber, list[Apartment]]:
     """Get the results for each subscriber"""
     subscriber_apartments: dict[Subscriber, list[Apartment]] = {}

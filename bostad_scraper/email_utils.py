@@ -28,7 +28,6 @@ class EmailSender:
         print("Sending email to", email_address)
 
         with smtplib.SMTP(self.server, self.port, timeout=5) as server:
-            server.set_debuglevel(1)  # Enable debugging
             server.ehlo()  # Identify with the mail server
             server.starttls()
             server.ehlo()  # Re-identify after encryption
