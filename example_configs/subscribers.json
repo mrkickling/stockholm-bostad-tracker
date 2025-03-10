@@ -1,0 +1,24 @@
+[
+    {
+        "email": "loxdal@proton.me",
+        "frequency": "daily",
+        "url": "test",
+        "filter": {
+            "city_areas": [],
+            "kommuns": ["Stockholm"],
+            "min_num_rooms": 2,
+            "min_size_sqm": 20,
+            "max_rent": 8000,
+
+            "require_balcony": false,
+            "require_elevator": false,
+            "require_new_production": false,
+
+            "include_youth": true,
+            "include_regular": false,
+            "include_student": false,
+            "include_senior": false,
+            "include_short_lease": true
+        }
+    }
+]
