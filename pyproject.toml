@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bostad-scraper"  # Add your project name here
+version = "0.1.0"
+description = "A web scraper for bostad listings"
+authors = [{ name = "Joakim Loxdal", email = "loxdal@proton.me" }]
+license = { text = "GPTv3" }
+dependencies = [
+    "requests",
+    "dotenv",
+    "Jinja2",
+]
+
+[project.scripts]
+bostad_tracker = "bostad_scraper:__main__.run"
+
+[tool.setuptools]
+packages = ["bostad_scraper"]
+
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
