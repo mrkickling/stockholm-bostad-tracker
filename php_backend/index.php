@@ -125,7 +125,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         .container {
             width: 80%;
             max-width: 800px;
-            margin: 50px auto;
+            margin: auto;
+            margin-top: 20px;
             padding: 20px;
             background-color: white;
             border-radius: 8px;
@@ -134,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         h2 {
             text-align: center;
-            color: #4CAF50;
+            color: #0568a1;
         }
 
         p {
@@ -155,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         button {
             width: 100%;
-            background-color: #4CAF50;
+            background-color:rgb(50, 122, 163);
             color: white;
             padding: 12px;
             border: none;
@@ -165,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #0568a1;
         }
 
         .info {
@@ -177,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         .info h3 {
-            color: #4CAF50;
+            color:rgb(42, 117, 160);
         }
 
         .info p {
@@ -190,28 +191,52 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: #777;
             margin-top: 10px;
         }
+
+        .logo {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .logo img {
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
 
+<div class="logo">
+    <img src="assets/logo.png" alt="">
+</div>
+
 <div class="container">
-    <h2>Stockholm Bostad Tracker - Prenumerera</h2>
+    <h2>Stockholm Bostad Tracker - Prenumerera på bostadskön</h2>
+
+    <?php if (isset($error)) {echo $error;} ?>
+
+    <div class="info">
+        <h3 style='margin-top:0'>Om Stockholm Bostad Tracker</h3>
+        <p>
+            Håll koll på <a href='https://bostad.stockholm.se/'>bostadskön</a> utan att aktivt gå in varje dag.
+            Du kommer få ett mejl varje dag det finns nya lägenheter som matchar ditt filter.
+            Din epostadress kommer inte delas med någon annan. Du kan när som helst avregistrera dig.
+        </p>
+
+        <p>
+            Projektet är öppet och fritt, se <a href="https://github.com/mrkickling/stockholm-bostad-tracker/">källkoden</a>.
+            Detta är ett hobbyprojekt, så om det slutar funka så kan det vara för att jag råkat dra ut sladden.
+            Mejla mig i så fall på <a href="mailto:loxdal@proton.me">loxdal@proton.me</a> så är jag tacksam.
+        </p>
+    </div>
+    <br>
     <form method="POST">
         <input type="email" name="email" required placeholder="Ange din epostadress">
         <button type="submit">Prenumerera</button>
     </form>
 
-    <div class="info">
-        <h3>Om Stockholm Bostad Tracker</h3>
-        <p>Håll koll på bostadskön utan att aktivt gå in varje dag. Skriv upp dig för att få epost med nya lägenheter som matchar ditt filter.</p>
-        <p>Projektet är öppet och fritt, se <a href="https://github.com/mrkickling/stockholm-bostad-tracker/">källkoden</a>.</p>
-
-        <div class="disclaimer">
-            <h4>Disclaimer</h4>
-            <p>Detta är ett hobbyprojekt, så om det slutar funka så kan det vara för att jag råkat dra ut sladden.</p>
-            <p>Mejla mig i så fall på <a href="mailto:loxdal@proton.me">loxdal@proton.me</a> så är jag tacksam.</p>
-        </div>
-    </div>
 </div>
 
 </body>

@@ -169,10 +169,13 @@ $current_filter = json_decode($user['filter'], true);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
+        .header-link {
+            color: #0568a1;
+            text-decoration: none;
+        }
         h2 {
             text-align: center;
-            color: #4CAF50;
+            color: #0568a1;
         }
 
         label {
@@ -198,7 +201,7 @@ $current_filter = json_decode($user['filter'], true);
         }
 
         button {
-            background-color: #4CAF50;
+            background-color: #0568a1;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -209,7 +212,7 @@ $current_filter = json_decode($user['filter'], true);
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #0568a1;
         }
 
         .form-group {
@@ -224,15 +227,25 @@ $current_filter = json_decode($user['filter'], true);
 
         .unsubscribe-btn {
             background-color: #f44336;
-            margin-top: 20px;
         }
 
         .unsubscribe-btn:hover {
             background-color: #e53935;
         }
+
+        .logo-img {
+            max-width: 300px;
+            margin: auto;
+            margin-top: 20px;
+            display: block;
+        }
     </style>
 </head>
 <body>
+
+<a class="header-link" href="index.php">
+    <img class="logo-img" src="assets/logo.png" alt="">
+</a>
 
 <div class="container">
     <h2>Redigera filter</h2>
