@@ -1,9 +1,55 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require 'db.php';
+
+function sendVerificationEmail($email_address, $secret_code, $verification_code) {
+    $env = parse_ini_file('.env');
+    $app_url = $env['APP_URL'];
+    
+    $verification_url = "$app_url/configure.php?id=$secret_code&verification_code=$verification_code";
+    $message = '
+    <html>
+    <head>
+        <title>Stockholm bostad tracker - verifiera din epost</title>
+    </head>
+    <body>
+        Hej '.$email_address.',<br><br>
+
+        du har anmält din epostadress till <a href='.$app_url.'>Stockholm bostad tracker</a>.<br>
+        Det innebär att du kommer få mejl när lägenheter som matchar ditt filter blir tillgängliga i Stockholms bostadskö.<br><br>
+
+        <a href='.$verification_url.'>Tryck här för att verifiera din epostadress</a> eller kopiera denna url till din webbläsare:<br>
+        '.$verification_url.'<br><br>
+
+        Om du inte begärde detta e-postmeddelande så ska du inte klicka på länken, utan bara ignorera det här mejlet.<br><br>
+
+        Vänliga hälsningar,<br>
+        Stockholm bostad tracker<br>
+    </body>
+    </html>
+    ';
+
+    // To send HTML mail, the Content-type header must be set
+    $headers = array(
+        'MIME-Version' => '1.0',
+        'Content-type' => 'text/html; charset=utf-8',
+        'From' => 'support@joakimloxdal.se',
+    );
+    
+    mail(
+        $email_address,
+        "Stockholm Bostad Tracker - verifiera din epostadress",
+        $message,
+        $headers,
+    );
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['email'];
     $secret_code = bin2hex(random_bytes(16)); // Generate a unique secret code
+    $verification_code = bin2hex(random_bytes(16)); // Generate a unique verification code
     $default_filter = json_encode([
         "city_areas" => [],
         "kommuns" => ["Stockholm"],
@@ -28,23 +74,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($stmt->num_rows > 0) {
         // Email already exists, handle error (e.g., show a message or redirect)
-        echo "Det finns redan en prenumeration med denna epostadress.";
-        exit();
+        $error = "Kunde ej registrera din epost.";
     }
 
-    // Prepare the SQL statement to insert the new subscription
-    $stmt = $conn->prepare("INSERT INTO bostad_tracker_subscribers (email, secret_code, filter) VALUES (?, ?, ?)");
+    if (!isset($error)) {
+        // Prepare the SQL statement to insert the new subscription
+        $stmt = $conn->prepare(
+            "INSERT INTO bostad_tracker_subscribers (email, secret_code, verification_code, filter) VALUES (?, ?, ?, ?)"
+        );
 
-    // Bind parameters
-    $stmt->bind_param("sss", $email, $secret_code, $default_filter);
+        // Bind parameters
+        $stmt->bind_param("ssss", $email, $secret_code, $verification_code, $default_filter);
+        // Execute the query
+        if ($stmt->execute()) {
+            // Redirect to the configuration page after successful subscription
 
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect to the configuration page after successful subscription
-        header("Location: configure.php?id=$secret_code");
-        exit();
-    } else {
-        echo "Error subscribing!";
+            // Send verification email
+            sendVerificationEmail($email, $secret_code, $verification_code);
+
+            // Send user to their page
+            header("Location: configure.php?id=$secret_code");
+            exit();
+        } else {
+            echo $stmt->error;
+            $error = "Lyckades inte registrera dig.";
+        }
     }
 }
 ?>

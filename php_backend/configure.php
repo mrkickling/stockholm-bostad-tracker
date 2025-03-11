@@ -1,18 +1,35 @@
 <?php
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
 require 'db.php';
 
+// Email verification
 if (!isset($_GET['id'])) {
     die("Invalid request.");
 }
 
 $secret_code = $_GET['id'];
 
+if (isset($_GET['verification_code'])) {
+
+    // Email is getting verified
+    $verification_code = $_GET['verification_code'];
+
+    // Set to verified
+    $query = "UPDATE bostad_tracker_subscribers SET verified = 1 WHERE verification_code = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $verification_code);
+    $success = $stmt->execute();
+
+    if (!$success) {
+        die(json_encode(["error" => "Database update failed"]));
+    }
+
+    header("Location: configure.php?id=$secret_code");
+    $stmt->close();
+    $conn->close();
+}
+
 // Prepare the SQL query to get the user's details
-$stmt = $conn->prepare("SELECT email, filter, frequency FROM bostad_tracker_subscribers WHERE secret_code = ?");
+$stmt = $conn->prepare("SELECT email, filter, frequency, verified FROM bostad_tracker_subscribers WHERE secret_code = ?");
 $stmt->bind_param("s", $secret_code);  // Bind the parameter
 $stmt->execute();
 $result = $stmt->get_result();
@@ -218,10 +235,13 @@ $current_filter = json_decode($user['filter'], true);
 <body>
 
 <div class="container">
-    <h2>Stockholm bostad tracker - Redigera filter</h2>
+    <h2>Redigera filter</h2>
 
     <center>
         <?= htmlspecialchars($user['email']); ?>
+        <?php if (!$user['verified']): ?>
+            <span style="color: red;">Ej verifierad epost - kolla din inkorg</span>
+        <?php endif; ?>
     </center>
 
     <form method="POST">
@@ -241,13 +261,13 @@ $current_filter = json_decode($user['filter'], true);
         </div>
 
         <!-- Frequency selection -->
-        <div class="form-group">
+        <!-- <div class="form-group">
             <label>Uppdateringsfrekvens:</label>
             <select name="frequency">
                 <option value="daily" <?= $user['frequency'] == 'daily' ? 'selected' : '' ?>>Dagligen</option>
                 <option value="weekly" <?= $user['frequency'] == 'weekly' ? 'selected' : '' ?>>Veckovis</option>
             </select>
-        </div>
+        </div> -->
 
         <!-- Checkbox fields -->
         <div class="form-group">
