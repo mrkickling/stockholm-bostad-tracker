@@ -27,12 +27,6 @@ services:
       - ./php_backend:/var/www/html
     ports:
       - "8080:80"
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_DATABASE=bostad_tracker
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=userpass
-      - API_KEY=supersecretapikey
     depends_on:
       - mysql
     networks:
