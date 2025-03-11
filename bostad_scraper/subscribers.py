@@ -20,7 +20,7 @@ class Subscriber:
         email: str,
         frequency: NotificationFrequency,
         search_filter: SearchFilter,
-        url = None
+        url=None,
     ):
         self.email = email
         self.frequency = frequency
@@ -49,9 +49,10 @@ def load_subscribers_from_json(
                 subscriber_info['email'],
                 subscriber_info['frequency'],
                 SearchFilter.from_dict(
-                    subscriber_info['filter']
+                    subscriber_info['filter'],
+                    published_after=subscriber_info.get('latest_notified')
                 ),
-                subscriber_info.get('url')
+                subscriber_info.get('url'),
             )
         )
     return subscribers
@@ -78,3 +79,10 @@ def load_subscribers_from_file(json_file: str):
     with open(json_file, 'r', encoding='utf-8') as f:
         subscribers_info_list = json.load(f)
         return load_subscribers_from_json(subscribers_info_list)
+
+def confirm_email_sent(url: str, subscriber: Subscriber):
+    """Send the email to a url as comfirmation that email was sent"""
+    res = requests.post(
+        url, data={'subscriber_email': subscriber.email}, timeout=100
+    )
+    res.raise_for_status()

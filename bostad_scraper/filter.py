@@ -1,6 +1,8 @@
 """Filter functionality"""
 
 from dataclasses import dataclass, field
+from datetime import date
+from typing import Optional
 from .apartments import Apartment
 
 # Trust me, this number is the highest possible
@@ -35,8 +37,10 @@ class SearchFilter:
     include_short_lease: bool = True
     include_regular: bool = True
 
+    published_after: Optional[date] = None
+
     @classmethod
-    def from_dict(cls, filter_dict: dict):
+    def from_dict(cls, filter_dict: dict, published_after=None):
         """Create a search filter from a dict"""
         return cls(
             # Areas
@@ -68,6 +72,12 @@ class SearchFilter:
             include_senior=filter_dict.get('include_senior', False),
             include_short_lease=filter_dict.get('include_short_lease', True),
             include_regular=filter_dict.get('include_regular', True),
+
+            # Publish time
+            published_after = (
+                date.fromisoformat(published_after)
+                if published_after else None
+            )
         )
 
     def matches(self, apartment: Apartment) -> bool:
@@ -110,6 +120,11 @@ class SearchFilter:
         match &= self.include_short_lease if apartment.short_lease else True
         match &= self.include_regular if apartment.regular else True
 
+        # filter older apartments
+        match &= (
+            self.published_after is None
+            or self.published_after < apartment.published_date
+        )
         return match
 
 

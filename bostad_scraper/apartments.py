@@ -1,6 +1,7 @@
 """Function to scrape Stockholm Bostad apartments"""
 
 from dataclasses import dataclass
+from datetime import date
 import requests
 
 @dataclass
@@ -32,6 +33,8 @@ class Apartment:
     short_lease: bool
     regular: bool
     apartment_type: str
+
+    published_date: date
 
     def __str__(self):
         """A string representation of an apartment"""
@@ -77,6 +80,9 @@ def get_apartments() -> list[Apartment]:
             short_lease=apartment_info.get('Korttid'),
             regular=apartment_info.get('Vanlig'),
             apartment_type=apartment_info.get('Lagenhetstyp').lower(),
+            published_date=(
+                date.fromisoformat(apartment_info.get('AnnonseradFran'))
+            )
         )
         apartments.append(apartment)
     return apartments

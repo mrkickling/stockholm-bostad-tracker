@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -10,7 +11,8 @@ from .apartments import Apartment, get_apartments
 from .subscribers import (
     Subscriber,
     load_subscribers_from_url,
-    load_subscribers_from_file
+    load_subscribers_from_file,
+    confirm_email_sent
 )
 
 # Use .env file for email settings
@@ -31,7 +33,8 @@ def write_results_to_file(
 
 
 def send_emails_to_subscribers(
-        results: dict[Subscriber, list[Apartment]]
+        results: dict[Subscriber, list[Apartment]],
+        confirm_email_sent_url: Optional[str] = None
     ):
     """Send email to each subscriber with results"""
     mail_sender = EmailSender(
@@ -42,8 +45,18 @@ def send_emails_to_subscribers(
     )
 
     for subscriber, apartments in results.items():
+        if len(apartments) == 0:
+            print(
+                f"Not sending email to {subscriber.email}, no new apartments"
+            )
+            continue
         content = build_email(subscriber, apartments)
         mail_sender.send_email(subscriber.email, content)
+        if confirm_email_sent_url:
+            confirm_email_sent(
+                confirm_email_sent_url,
+                subscriber
+            )
 
 
 def get_subscriber_apartments(
@@ -94,4 +107,4 @@ def run():
 
     write_results_to_file(subscriber_apartments, "results.txt")
     if args.send_emails:
-        send_emails_to_subscribers(subscriber_apartments)
+        send_emails_to_subscribers(subscriber_apartments, args.url)
