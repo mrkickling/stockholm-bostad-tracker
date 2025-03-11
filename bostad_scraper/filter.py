@@ -123,7 +123,7 @@ class SearchFilter:
         # filter older apartments
         match &= (
             self.published_after is None
-            or self.published_after < apartment.published_date
+            or apartment.published_date >= self.published_after
         )
         return match
 
