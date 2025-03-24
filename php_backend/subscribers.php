@@ -3,6 +3,8 @@ require 'includes/db.php';
 require 'includes/subscriber.php';
 require 'includes/subscribers.php';
 
+header(header: 'Content-Type: application/json');
+
 // Stuff below requires api key
 $env = parse_ini_file(filename: '.env');
 $app_url = $env['APP_URL'];
@@ -14,12 +16,4 @@ if ($provided_key !== $api_key) {
     die(json_encode(value: ["error" => "Invalid API key"]));
 }
 
-// Update latest sync for subcriber
-if (isset($_POST['subscriber_email'])) {
-    $subscriber_email = $_POST['subscriber_email'];
-    setLatestNotified($conn, $subscriber_email);
-
-} else {
-    header(header: "Content-Type: application/json");
-    return getAllSubscribers($conn, $app_url);
-}
+echo getAllSubscribers($conn, app_url: $app_url);
