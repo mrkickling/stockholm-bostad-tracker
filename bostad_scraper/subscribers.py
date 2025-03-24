@@ -4,9 +4,6 @@ import json
 
 import requests
 
-from .filter import SearchFilter, filter_apartments
-from .apartments import Apartment
-
 class NotificationFrequency(Enum):
     """How often the user wants to be notified"""
     DAILY = 'daily'
@@ -19,23 +16,19 @@ class Subscriber:
         self,
         email: str,
         frequency: NotificationFrequency,
-        search_filter: SearchFilter,
-        url=None,
+        url,
+        latest_notified,
     ):
         self.email = email
         self.frequency = frequency
-        self.filter = search_filter
         self.url = url
+        self.latest_notified = latest_notified
 
     def __hash__(self):
         return hash(self.email)
 
     def __repr__(self):
         return f"Subscriber({self.email})"
-
-    def matching_apartments(self, all_apartments: list[Apartment]):
-        """Return apartments matching users filter"""
-        return filter_apartments(all_apartments, self.filter)
 
 
 def load_subscribers_from_json(
@@ -48,23 +41,21 @@ def load_subscribers_from_json(
             Subscriber(
                 subscriber_info['email'],
                 subscriber_info['frequency'],
-                SearchFilter.from_dict(
-                    subscriber_info['filter'],
-                    published_after=subscriber_info.get('latest_notified')
-                ),
-                subscriber_info.get('url'),
+                subscriber_info['url'],
+                subscriber_info['latest_notified'],
             )
         )
     return subscribers
 
 
-def load_subscribers_from_url(url: str):
+def load_subscribers_from_url(url: str, api_key: str):
     """Load JSON from URL
     
     URL should return a list in JSON format matching
     the format described in the README.
     """
-    res = requests.get(url, timeout=60)
+    subscribers_url = f"{url}/subscribers.php?api_key={api_key}"
+    res = requests.get(subscribers_url, timeout=60)
     res.raise_for_status()
     subscribers_info_list = res.json()
     return load_subscribers_from_json(subscribers_info_list)
@@ -80,9 +71,17 @@ def load_subscribers_from_file(json_file: str):
         subscribers_info_list = json.load(f)
         return load_subscribers_from_json(subscribers_info_list)
 
-def confirm_email_sent(url: str, subscriber: Subscriber):
-    """Send the email to a url as comfirmation that email was sent"""
+
+def sync_subscriber(url: str, api_key: str, subscriber: Subscriber):
+    """Notify subscriber with new apartments if there are new ones"""
+    subscribers_url = (
+        f"{url}/sync_subscriber.php?api_key={api_key}"
+    )
     res = requests.post(
-        url, data={'subscriber_email': subscriber.email}, timeout=100
+        subscribers_url,
+        data={'email': subscriber.email},
+        timeout=60
     )
     res.raise_for_status()
+    sync_result = res.json()
+    print(sync_result.get('message'))
