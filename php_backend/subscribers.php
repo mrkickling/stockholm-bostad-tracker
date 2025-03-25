@@ -1,7 +1,6 @@
 <?php
 require 'includes/db.php';
 require 'includes/subscriber.php';
-require 'includes/subscribers.php';
 
 header(header: 'Content-Type: application/json');
 

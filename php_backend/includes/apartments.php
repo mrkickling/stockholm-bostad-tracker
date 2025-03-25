@@ -1,5 +1,65 @@
 <?php
 
+function insertApartment($conn, $apartment) {
+    $stmt = $conn->prepare("
+        SELECT internal_id FROM bostad_tracker_apartments 
+        WHERE internal_id = ?
+    ");
+    $stmt->bind_param("s", $apartment['internal_id']);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        return ["status" => "error", "message" => "Apartment already exists.", "internal_id" => $apartment['internal_id']];
+    }
+
+    $stmt = $conn->prepare("
+        INSERT INTO bostad_tracker_apartments (
+            internal_id, city_area, address, kommun, floor, num_rooms, size_sqm, rent, url,
+            has_balcony, has_elevator, new_production, youth, student, senior,
+            short_lease, regular, apartment_type, published_date, last_date,
+            latitude, longitude
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    if (!$stmt) {
+        return ["status" => "error", "message" => "SQL prepare failed: " . $conn->error];
+    }
+
+    $stmt->bind_param(
+        "ssssiiddsddddddddsssdd",
+        $apartment['internal_id'],
+        $apartment['city_area'],
+        $apartment['address'],
+        $apartment['kommun'],
+        $apartment['floor'],
+        $apartment['num_rooms'],
+        $apartment['size_sqm'],
+        $apartment['rent'],
+        $apartment['url'],
+        $apartment['has_balcony'],
+        $apartment['has_elevator'],
+        $apartment['new_production'],
+        $apartment['youth'],
+        $apartment['student'],
+        $apartment['senior'],
+        $apartment['short_lease'],
+        $apartment['regular'],
+        $apartment['apartment_type'],
+        $apartment['published_date'],
+        $apartment['last_date'],
+        $apartment['latitude'],
+        $apartment['longitude']
+    );
+
+    if (!$stmt->execute()) {
+        return ["status" => "error", "message" => "Insertion failed: " . $stmt->error, "internal_id" => $apartment['internal_id']];
+    }
+
+    return ["status" => "success", "message" => "Apartment inserted successfully.", "internal_id" => $apartment['internal_id']];
+}
+
+
 function getNewMatchingApartments($conn, $subscriber): array {
     // Convert the comma-separated string into an array
     $cityAreasArray = array_filter(array_map('trim', explode(",", $subscriber['city_areas'])));
@@ -34,9 +94,6 @@ function getNewMatchingApartments($conn, $subscriber): array {
     // Prepare the statement
     $stmt = $conn->prepare($query);
 
-    // Prepare the data for binding
-    $old_times = "2025-03-24 19:14:57";
-
     // Create types string for bind_param()
     $types = str_repeat('s', count($cityAreasArray)) . "siiiiiiiiiiis"; // 's' for each city area
 
@@ -53,7 +110,7 @@ function getNewMatchingApartments($conn, $subscriber): array {
         $subscriber['include_senior'], 
         $subscriber['include_short_lease'], 
         $subscriber['include_regular'],
-        $old_times
+        $subscriber['latest_notified']
     ]);
 
     // Bind parameters dynamically

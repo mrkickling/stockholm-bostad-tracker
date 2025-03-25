@@ -29,9 +29,10 @@ if (isset($_POST['email'])) {
     } else {
         echo json_encode(value: [
             'status' => 'success',
-            'message'=> 'No new matching apartments'
+            'message'=> 'No new matching apartments for ' . $email . '.'
         ]);
     }
+    updateLatestNotified($conn, $subscriber);
 }
 
 ?>

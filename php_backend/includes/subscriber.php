@@ -2,6 +2,35 @@
 
 require "email_verification.php";
 
+function getAllSubscribers($conn, $app_url) {
+    // Get all subscribers
+    $query = "SELECT email, frequency, secret_code, latest_notified 
+              FROM bostad_tracker_subscribers WHERE verified = 1";
+    $result = $conn->query($query);
+
+    if (!$result) {
+        die(json_encode(["error" => "Database query failed"]));
+    }   
+
+    $subscribers = [];
+    while ($row = $result->fetch_assoc()) {
+
+        $subscriber = [];
+
+        // Add the URL for configuration
+        $subscriber['url'] = $app_url . "/configure.php?id=" . $row['secret_code'];
+        $subscriber['email'] = $row['email'];
+        $subscriber['frequency'] = $row['frequency'];
+        $subscriber['latest_notified'] = $row['latest_notified'];
+
+        // Add the row to the subscribers array
+        $subscribers[] = $subscriber;
+    }
+
+    return json_encode($subscribers);
+}
+
+
 function updateFilter($conn, $user, $secret_code, $post_body) {
     // Prepare the update query with all necessary fields
     $stmt = $conn->prepare(
@@ -323,8 +352,21 @@ function sendNotificationEmail($subscriber, $apartments) {
     );
     return mail(
         $subscriber['email'],
-        "Stockholm Bostad Tracker - nya lägenheter",
+        "Stockholm Bostad Tracker - " . count($apartments) . "nya lägenheter",
         $email_content,
         $headers
     );
+}
+
+
+function updateLatestNotified($conn, $subscriber) {
+    $query = "UPDATE bostad_tracker_subscribers SET latest_notified = NOW() WHERE id = ?";
+    
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param("i", $subscriber['id']);
+        $stmt->execute();
+        $stmt->close();
+    } else {
+        error_log("Failed to prepare statement: " . $conn->error);
+    }
 }
