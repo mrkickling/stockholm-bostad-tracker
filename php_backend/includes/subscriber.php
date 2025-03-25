@@ -238,7 +238,9 @@ function unsubscribe($conn, $secret_code) {
     }
 }
 
-function generateNotificationEmail($subscriber, $apartments) {
+function generateNotificationEmail($subscriber, $apartments, $app_url) {
+    $secret_key = $subscriber['secret_key'];
+    $subscriber_url = "$app_url/configure.php?id=$secret_key";
     ob_start();
     ?>
     <!DOCTYPE html>
@@ -330,9 +332,9 @@ function generateNotificationEmail($subscriber, $apartments) {
             <?php endforeach; ?>
 
             <div class="footer">
-                <a href="<?= htmlspecialchars($subscriber['url']) ?>">Avprenumerera</a>
+                <a href="<?= $subscriber_url ?>">Avprenumerera</a>
                 -
-                <a href="<?= htmlspecialchars($subscriber['url']) ?>">Redigera filter</a>
+                <a href="<?= $subscriber_url ?>">Redigera filter</a>
             </div>
         </div>
     </body>
@@ -343,8 +345,8 @@ function generateNotificationEmail($subscriber, $apartments) {
 
 }
 
-function sendNotificationEmail($subscriber, $apartments) {
-    $email_content = generateNotificationEmail($subscriber, $apartments);
+function sendNotificationEmail($subscriber, $apartments, $app_url) {
+    $email_content = generateNotificationEmail($subscriber, $apartments, $app_url);
     $headers = array(
         'MIME-Version' => '1.0',
         'Content-type' => 'text/html; charset=utf-8',

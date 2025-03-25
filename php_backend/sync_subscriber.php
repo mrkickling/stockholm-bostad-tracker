@@ -25,7 +25,7 @@ if (isset($_POST['email'])) {
             'status' => 'success',
             'message'=> 'Sending email with ' . count($matching_new_apartments) . ' apartments to ' . $email . '.'
         ]);
-        sendNotificationEmail($subscriber, $matching_new_apartments);
+        sendNotificationEmail($subscriber, $matching_new_apartments, $app_url);
     } else {
         echo json_encode(value: [
             'status' => 'success',
