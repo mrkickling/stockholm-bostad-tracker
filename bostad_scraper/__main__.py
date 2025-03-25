@@ -27,5 +27,4 @@ def run():
     print(f"Found {len(all_apartments)} apartments")
     upload_apartments(args.base_url, args.api_key, all_apartments)
     for subscriber in subscribers:
-        print(f"Syncing {subscriber}")
         sync_subscriber(args.base_url, args.api_key, subscriber)

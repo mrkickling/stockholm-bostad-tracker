@@ -1,23 +1,14 @@
 [
     {
-        "email": "email@example.com",
+        "url": "https:\/\/joakimloxdal.se\/projekt\/stockholm-bostad-tracker\/configure.php?id=test",
+        "email": "example@example.me",
         "frequency": "daily",
-        "filter": {
-            "city_areas": [],
-            "kommuns": ["Stockholm"],
-            "min_num_rooms": 2,
-            "min_size_sqm": 20,
-            "max_rent": 8000,
-
-            "require_balcony": false,
-            "require_elevator": false,
-            "require_new_production": false,
-
-            "include_youth": true,
-            "include_regular": false,
-            "include_student": false,
-            "include_senior": false,
-            "include_short_lease": true
-        }
+        "latest_notified": "2025-03-25 10:29:39"
+    },
+    {
+        "url": "https:\/\/joakimloxdal.se\/projekt\/stockholm-bostad-tracker\/configure.php?id=test2",
+        "email": "example2@example.me",
+        "frequency": "daily",
+        "latest_notified": "2025-03-25 10:29:39"
     }
 ]
